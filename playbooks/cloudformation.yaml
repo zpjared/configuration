@@ -38,8 +38,8 @@
       template_parameters:
         KeyName: stanford-online-20130415
         InstanceType: m1.small
-        NameTag: edx-ec2
-        GroupTag: edx-group
+        NameTag: edx-sefk
+        GroupTag: edx-group-sefk
     register: stack
   - name: show stack outputs
     debug: msg="My stack outputs are ${stack.stack_outputs}"

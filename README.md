@@ -2,6 +2,69 @@
 
 ## Ansible
 
+Ansible is a configuration management tool that edX is evaluating to replace the puppet environment 
+that was used for MITx and edX prior to going open source.
+
+http://ansible.cc/docs
+
+
+
+## Directory Structure
+
+The directory structure should follow Ansible best practices.
+
+http://ansible.cc/docs/bestpractices.html
+
+
+
+* Hosts -  The ec2.py inventory script generates an inventory file where hosts are assigned to groups. 
+           Individual hosts can be targeted by the "Name" tag or the instance ID. 
+           I don't think there will be a reason to set host specific variables.
+* Groups - Groups are created automatically where hosts can be targeted by tags, security groups, region, etc.
+           In the edX context a group would be a set of machines that are deployed to that have one or more
+           roles. 
+* Roles  - A role will map to a single function/service that runs on server.
+
+
+
+```
+
+ec2.py                    # inventory script for creating groups from ec2 tags
+
+group_vars/
+   all                    # assign any variables that are common to all edX groups
+   tag_group_edxapp       # a variable set to true for every group of machines in the 
+   tag_group_xserver      # edX infrastructure
+   tag_group_worker
+   (etc..)
+
+site.yml                  # master playbook, this will include all groups
+
+edxapp.yml                # defines what roles will be configured for a group of machines 
+xserver.yml               
+worker.yml
+(etc..)
+
+roles/
+    common/               # tasks that are common to all roles 
+        tasks/            #
+            main.yml      #  <-- tasks file can include smaller files if warranted
+        handlers/         #
+            main.yml      #  <-- handlers file
+        templates/        #  <-- files for use with the template resource
+            ntp.conf.j2   #  <------- templates end in .j2
+        files/            #
+            bar.txt       #  <-- files for use with the copy resource
+        secure/           #  <-- Not checked in, will have secure data that cannot be public
+  
+    lms/                  # same structure as "common" was above
+    xserver/              # ""
+    worker/               # ""
+    (etc..)
+    
+```
+    
+
 ### Installation
 
 ```

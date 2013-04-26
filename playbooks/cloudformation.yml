@@ -26,9 +26,10 @@
   connection: local
   gather_facts: false
 
-  # Launch the cloudformation-example.json template.  Register the output.
+  # Launch the cloudformation template, register the output
 
   tasks:
+
   - name: edX configuration
     cloudformation: >
       stack_name="$name" state=present
@@ -39,6 +40,8 @@
         KeyName: $key
         InstanceType: m1.small
         GroupTag: $group
+        AdditionalSecurityGroups: '{{ secgroups }}'
     register: stack
+
   - name: show stack outputs
     debug: msg="My stack outputs are ${stack.stack_outputs}"

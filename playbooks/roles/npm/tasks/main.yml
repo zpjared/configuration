@@ -1,4 +1,5 @@
 # requires:
+#   - that the platform repo is already checked out--currently in lms role
 #   - common/tasks/main.yml
 #   - ruby/tasks/main.yml
 ---

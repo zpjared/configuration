@@ -1,4 +1,4 @@
-#
+#requires that the platform repo is already checked out--currently in lms role
 #cribbed from https://github.com/mmoya/ansible-playbooks/blob/master/rbenv/main.yml
 - name: Create 'www' user (replicating historical environment)
   user: name=www state=present

@@ -28,6 +28,15 @@
   - lms-env
   - update
 
+- name: Change owner on staticfiles
+  file: path={{ app_base_dir }}/staticfiles state=directory owner=www-data group=www-data
+  tags:
+  - cms
+  - lms
+  - lms-env
+  - update
+
+
 - name: Create lms log target directory
   file: path={{log_base_dir}}/lms state=directory owner=syslog group=adm mode=2770
   tags:
@@ -76,7 +85,7 @@
 
 ## Install the debian package requirements system-wide
 - name: store remote apt_repos list for ansible use
-  command: cat {{ apt_sources_file }}
+  command: cat {{platform_code_dir}}/apt-repos.txt
   register: apt_repos_list
   tags:
   - lms
@@ -103,7 +112,7 @@
   - install
 
 - name: store remote apt_packages list for ansible use
-  command: cat {{ apt_packages_file }}
+  command: cat {{platform_code_dir}}/apt-packages.txt
   register: apt_packages_list
   tags:
   - lms
@@ -118,42 +127,25 @@
   - cms
   - install
 
+# Install the python requirements into $venv_dir 
+- name : install python pre-requirements
+  pip: requirements="{{platform_code_dir}}/pre-requirements.txt" virtualenv="{{venv_dir}}" state=present
+  tags:
+  - lms
+  - cms
+  - install
 
-# Install the python modules into {{ venv_dir }}
-- name : install base python packages using the shell
+# Install the python modules into $venv_dir 
+- name : install python packages using the shell
+  #pip: requirements="{{platform_code_dir}}/requirements.txt" virtualenv="{{venv_dir}}" 
   # Need to use shell rather than pip so that we can maintain the context of our current working directory; some 
   # requirements are pathed relative to the edx-platform repo. Using the pip from inside the virtual environment implicitly
   # installs everything into that virtual environment.
-  shell: cd {{ platform_code_dir }} && {{ venv_dir }}/bin/pip install --use-mirrors -r {{ base_requirements_file }}
+  shell: cd {{platform_code_dir}} && {{venv_dir}}/bin/pip install --use-mirrors -r {{platform_code_dir}}/requirements.txt
   tags:
   - lms
   - cms
   - install
   
-  
-# Install the python post requirements into {{ venv_dir }}
-- name : install python post-requirements
-  pip: requirements="{{ post_requirements_file }}" virtualenv="{{ venv_dir }}" state=present
-  tags:
-  - lms
-  - cms
-  - install
-
-# Install the final python modules into {{ venv_dir }}
-- name : install python post-post requirements using the shell
-  # Need to use shell rather than pip so that we can maintain the context of our current working directory; some 
-  # requirements are pathed relative to the edx-platform repo. Using the pip from inside the virtual environment implicitly
-  # installs everything into that virtual environment.
-  shell: cd {{ platform_code_dir }} && {{ venv_dir }}/bin/pip install --use-mirrors -r {{ item }}
-  with_items:
-  - "{{ repo_requirements_file }}"
-  - "{{ github_requirements_file }}"
-  - "{{ local_requirements_file }}"
-  tags:
-  - lms
-  - cms
-  - install
-  
-
 # Creates LMS upstart file
 - include: ../../gunicorn/tasks/upstart.yml service_variant=lms

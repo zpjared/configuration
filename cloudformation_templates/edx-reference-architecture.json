@@ -155,7 +155,6 @@
     },
     "DBUsername":{
       "Default":"edxapp",
-      "NoEcho":"true",
       "Description":"The database admin account username",
       "Type":"String",
       "MinLength":"1",
@@ -170,7 +169,8 @@
       "Type":"String",
       "MinLength":"8",
       "MaxLength":"41",
-      "ConstraintDescription":"must contain only alphanumeric characters."
+      "AllowedPattern":"[a-zA-Z][-_=,.:;a-zA-Z0-9]*",
+      "ConstraintDescription":"start with a letter, alphanumeric or -_=,.:; after that, minimum 8 chars."
     },
     "DBClass":{
       "Default":"db.m1.small",

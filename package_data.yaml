@@ -167,6 +167,8 @@ post_checkout_regex: !!omap
       LMS_VARIANT="$(ls -1 /opt/wwc/lms*.env.json | tail -1 | xargs -i basename {{}} .env.json)"
       export RUN="sudo -E -u www-data env SERVICE_VARIANT=$LMS_VARIANT PATH=$PATH"
       cd /opt/wwc/edx-platform
+      env
+      whoami
 
       # If we're gather_assets is available, run it (to compile coffee and sass, and then collectstatic)
       if $(rake -T | grep --quiet gather_assets); then

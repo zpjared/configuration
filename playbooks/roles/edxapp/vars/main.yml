@@ -73,7 +73,6 @@ lms_debian_pkgs:
   - libxml2-utils
   - libxslt1-dev
   - maven2
-  - mongodb
   - mongodb-clients
   - mysql-client
   - npm

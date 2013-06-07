@@ -15,10 +15,10 @@ WSGIRestrictEmbedded On
 
     SetEnv SERVICE_VARIANT lms
     
-    WSGIScriptAlias / {{platform_code_dir}}/lms/wsgi_apache.py
+    WSGIScriptAlias / {{platform_code_dir}}/lms/wsgi_apache_lms.py
 
     <Directory {{platform_code_dir}}/lms>
-    <Files wsgi_apache.py>
+    <Files wsgi_apache_lms.py>
         Order deny,allow
         Allow from all
     </Files>

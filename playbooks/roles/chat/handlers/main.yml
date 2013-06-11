@@ -1,0 +1,18 @@
+---
+### It turns out that the init script doesn't properly terminate everything
+#   that needs to be killed or clean up everything that needs cleaning up,
+#   for us to be confident that things will work properly the next time we
+#   startup.
+- name: kill beam
+  command: /usr/bin/killall beam
+  notify: kill epmd
+
+- name: kill epmd
+  command: /usr/bin/killall epmd
+  notify: remove ejabberd pid
+
+- name: remove ejabberd pid
+  file: path=/var/run/ejabberd/ejabberd.pid state=absent
+
+- name: store hostname for future use
+  shell: hostname >/etc/ansible_hostname

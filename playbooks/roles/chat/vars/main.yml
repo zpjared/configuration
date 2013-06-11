@@ -1,0 +1,12 @@
+ejabberd_debian_pkgs:
+# must have for chat 
+- ejabberd
+# necessary to build erlang modules
+- subversion
+- erlang
+- erlang-manpages
+- erlang-base
+- erlang-dev
+- erlang-doc
+- erlang-edoc
+- erlang-examples

@@ -1,0 +1,77 @@
+# requires:
+#  - group_vars/all
+#  - common/tasks/main.yml
+---
+- name: install ejabberd
+  apt: pkg={{item}} state=present
+  with_items: ejabberd_debian_pkgs
+  tags:
+  - chat
+
+### When Debian/Ubuntu installs ejabberd, it starts it. It then creates a bunch
+#   of configuration, which is incorrect. So we have to stop it and clean up its
+#   bad autoconfiguration before we can set things up properly.
+- name: stop ejabberd (it can't run while it's being reconfigured)
+  #service: name=ejabberd state=stopped
+  shell: /etc/init.d/ejabberd stop 
+  tags:
+  - chat
+  #notify: kill beam
+  # the ejabberd init scripts are pretty crappy, so to make sure it's really
+  # dead, we have to do the following
+- shell: killall -q beam; /bin/true;
+- shell: killall -q epmd; /bin/true;
+- shell: rm -f /var/run/ejabberd/ejabberd.pid
+
+### The following group of recipes wipe out the mnesia tables if our node name
+#   has changed. FIXME: this relies on clustering to keep us safe, and on having
+#   only a safe number of nodes down at any given time. We should do a backup,
+#   edit and restore instead.
+- name: store hostname now if and only if we have never stored the hostname
+  shell: hostname >/etc/ansible_hostname creates=/etc/ansible_hostname
+
+- name: store whether to alter configuration b/c hostname has changed
+  shell: cat /etc/ansible_hostname /etc/hostname | sort | uniq | wc -l
+  register: hostnames
+
+- name: store list of mnesia tables for removal, if hostname has changed
+  command: ls -1 /var/lib/ejabberd
+  register: mnesia_tables_for_removal
+  when: hostnames.stdout == '2'
+
+- name: wipe mnesia tables if hostname has changed
+  file: path=/var/lib/ejabberd/$item state=absent
+  with_items: mnesia_tables_for_removal.stdout.split()
+  when: hostnames.stdout == '2'
+  notify: store hostname for future use
+
+- name: install /etc/default/ejabberd
+  template: backup=yes dest=/etc/default/ejabberd src=etc-default-ejabberd owner=root group=root mode=0644
+
+- name: create ejabberd logs directory
+  file: path="{{log_base_dir}}/jabber_logs" state=directory owner=ejabberd group=adm mode=2750
+
+- name: install /etc/ejabberd/ejabberd.ctf
+  template: backup=yes dest=/etc/ejabberd/ejabberd.cfg src=etc-ejabberd-ejabberd.cfg owner=ejabberd group=ejabberd mode=0600
+
+- name: create ejabberd module directory
+  file: path="/usr/local/lib/ejabberd/ebin" state=directory owner=root group=root mode=0755
+
+- name: check out ejabberd/mysql connecter source
+  subversion: repo=http://svn.process-one.net/ejabberd-modules/mysql/trunk/ dest=/tmp/ejabberd_mysql
+
+- name: build and install ejabberd/mysql connecter modules
+  shell: cd /tmp/ejabberd_mysql && ./build.sh; install -C -m 0644 -g root -o root ebin/*.beam /usr/local/lib/ejabberd/ebin/
+
+- name: make sure erlang clustering cookie is in place
+  copy: dest=/var/lib/ejabberd/.erlang.cookie content="{{chat_config['JABBER_ERL_COOKIE']}}" owner=ejabberd group=ejabberd mode=0400
+
+### Hey, now we should be able to safely start ejabberd
+- name: start ejabberd now that it's configured
+  service: name=ejabberd state=started
+  tags:
+  - chat
+
+# TODO:
+# - clustering setup/startup
+# - boto recipe to add to ELB

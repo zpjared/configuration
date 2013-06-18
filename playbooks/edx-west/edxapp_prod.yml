@@ -1,7 +1,4 @@
-#- hosts: tag_environment_prod:&tag_function_webserver
-- hosts: ~tag_Name_app(11|21)_prod
-#- hosts: tag_environment_prod:&tag_function_webserver
-#- hosts: security_group_edx-prod-EdxappServerSecurityGroup-NSKCQTMZIPQB
+- hosts: ~tag_Name_app(21).prod
   sudo: True
   vars_files:
     - "{{ secure_dir }}/vars/edxapp_prod_vars.yml"

@@ -27,6 +27,13 @@
   - logging
   - update
 
+- name: Write out upstart script to always create nginx log directory on startup
+  template: src=nginx-dirs.conf.j2 dest=/etc/init/nginx-dirs.conf owner=root group=adm
+  tags:
+  - nginx
+  - logging
+  - update
+
 # removing default link
 - name: Removing default nginx config and restart (enabled)
   file: path=/etc/nginx/sites-enabled/default state=absent

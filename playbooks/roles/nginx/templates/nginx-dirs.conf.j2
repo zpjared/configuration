@@ -1,0 +1,11 @@
+description     "Ensure nginx has the logging directories it needs"
+
+start on mounted MOUNTPOINT=/mnt
+task
+
+script
+        mkdir -m 2770 {{ log_base_dir }}
+        chown syslog:adm {{ log_base_dir }}
+        mkdir -m 2770 {{ log_base_dir }}/nginx
+        chown syslog:adm {{ log_base_dir }}/nginx
+end script

@@ -38,4 +38,4 @@
         type: CNAME 
         value: "{{item}}"
         name: "{{dns_name}}"
-      with_items: "{{launched}}"
+      with_items: "{{ groups['launched'] }}"

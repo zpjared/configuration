@@ -26,6 +26,6 @@
     - name: create github user
       user: name={{ github_user }} append=yes groups="adm" shell=/bin/bash
     - name: create ssh dir for user
-      file: path=/home/{{github_user}}/.ssh state=directory mode=0600
+      file: path=/home/{{github_user}}/.ssh state=directory mode=0600 owner={{github_user}} group={{github_user}}
     - name: copy key for github user
-      get_url: url=https://github.com/jarv.keys dest=/home/{{github_user}}/.ssh/authorized_keys mode=0600
+      get_url: url=https://github.com/jarv.keys dest=/home/{{github_user}}/.ssh/authorized_keys mode=0600 owner={{github_user}} group={{github_user}}

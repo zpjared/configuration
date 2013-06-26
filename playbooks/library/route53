@@ -1,0 +1,168 @@
+#!/usr/bin/python
+# This file is part of Ansible
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+
+DOCUMENTATION = '''
+---
+module: route53
+short_description: create or remove route53 dns records
+description:
+     - Create or remove route53 dns records
+version_added: "1.3"
+options:
+  zone_id:
+    description:
+      - zone_id for the domain
+    required: true
+    default: null
+  value:
+    description:
+      - value for the record
+  type:
+    description:
+      - record type
+  state:
+    description:
+      - add or remove the record
+  ec2_secret_key:
+    description:
+      - ec2 secret key
+    required: false
+    default: null
+    aliases: []
+  ec2_access_key:
+    description:
+      - ec2 access key
+    required: false
+    default: null
+    aliases: []
+
+
+requirements: [ "boto" ]
+author: John Jarvis
+'''
+
+EXAMPLES = '''
+# Add a dns entry
+- local_action:
+    module: route53
+    state: present
+    type: CNAME
+    value: something-hard-to-remember.amazonaws.com
+    name: myawesomedomain.example.com
+
+'''
+
+import sys
+import time
+
+try:
+    import boto.route53
+    from boto.route53.exception import DNSServerError
+except ImportError:
+    print "failed=True msg='boto required for this module'"
+    sys.exit(1)
+
+
+class Route53:
+
+    def __init__(self, name, value, zone_id, type, module):
+        self.name = name
+        self.value = value
+        self.zone_id = zone_id
+        self.type = type
+        self.changed = False
+        self.module = module
+
+    def create_cname(self):
+        change_set = boto.route53.record.ResourceRecordSets()
+        create = change_set.add_change('CREATE', self.name, self.type)
+        create.add_value(self.value)
+        try:
+            r53.change_rrsets(self.zone_id, change_set.to_xml())
+            self.changed = True
+        except DNSServerError as e:
+            # examine the xml output to see if the record
+            # already exists
+            if 'already exists' in str(e):
+                pass
+            else:
+                self.module.fail_json(msg='failed to update record: {}'.format(e))
+
+
+    def delete_cname(self):
+        change_set = boto.route53.record.ResourceRecordSets()
+        delete = change_set.add_change('DELETE', self.name, self.type)
+        delete.add_value(self.value)
+        try:
+            r53.change_rrsets(self.zone_id, change_set.to_xml())
+            self.changed = True
+        except DNSServerError as e:
+            if 'not found' in str(e):
+                pass
+             
+
+
+def main():
+
+    module = AnsibleModule(
+        argument_spec = dict(
+            region = dict(choices=['eu-west-1', 'sa-east-1', 
+                                   'us-east-1', 'ap-northeast-1', 
+                                   'us-west-2', 'us-west-1', 'ap-southeast-1', 
+                                   'ap-southeast-2']),
+            ec2_url = dict(aliases=['EC2_URL']),
+            ec2_secret_key = dict(aliases=['EC2_SECRET_KEY'], no_log=True),
+            ec2_access_key = dict(aliases=['EC2_ACCESS_KEY']),
+            state = dict(default='present'),
+            type = dict(default='CNAME'),
+            value = dict(required=True),
+            name = dict(required=True)
+        )
+    )
+
+    ec2_url = module.params.get('ec2_url')
+    ec2_secret_key = module.params.get('ec2_secret_key')
+    ec2_access_key = module.params.get('ec2_access_key')
+    region = module.params.get('region')
+    termination_list = module.params.get('termination_list')
+
+
+    # If we have a region specified, connect to its endpoint.
+    if region:
+        try:
+            r53 = boto.ec2.connect_to_region(region, aws_access_key_id=ec2_access_key,
+                                             aws_secret_access_key=ec2_secret_key)
+        except boto.exception.NoAuthHandlerFound, e:
+            module.fail_json(msg = str(e))
+    # Otherwise, no region so we fallback to the old connection method
+    else:
+        try:
+            ec2 = boto.connect_route53(ec2_access_key, ec2_secret_key)
+        except boto.exception.NoAuthHandlerFound, e:
+            module.fail_json(msg = str(e))
+
+    route53 = Route53(name, value, zone_id, type, module)
+
+    if module.params.get('state') == 'absent':
+        route53.create_cname()
+
+    elif module.params.get('state') == 'present':
+        route53.delete_cname()
+
+# this is magic, see lib/ansible/module_common.py
+#<<INCLUDE_ANSIBLE_MODULE_COMMON>>
+
+main()

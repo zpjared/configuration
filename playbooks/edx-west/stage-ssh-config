@@ -1,15 +1,14 @@
 #### edx-stage VPC 
 
-Host 54.241.183.3
-#Host vpc-jumpbox
-    HostName 54.241.183.3
+Host jump-stage
+    HostName jump.stage.class.stanford.edu
     User ubuntu
     ForwardAgent yes
 
 Host *.us-west-1.compute.internal
+    ProxyCommand ssh -W %h:%p ubuntu@jump-stage
     User ubuntu
     ForwardAgent yes
-    ProxyCommand ssh -W %h:%p ubuntu@54.241.183.3
 
 Host *
     ForwardAgent yes

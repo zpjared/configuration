@@ -42,6 +42,7 @@
       - cms
       - verify
       nginx_template_directory: "{{local_dir}}/nginx/templates/"
+      tags: nginx
     - role: edxapp
       devstack: false
     - apache

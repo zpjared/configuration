@@ -8,5 +8,6 @@
 # license:    https://github.com/edx/configuration/blob/master/LICENSE.TXT
 #
 
-openbadges_code_dir:
-openbadges_mysql_db:
+openbadges_code_dir: "{{ COMMON_APP_DIR }}/openbadges"
+
+#api_mysql_db: badgekitapi

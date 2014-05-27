@@ -8,44 +8,44 @@
 # license:    https://github.com/edx/configuration/blob/master/LICENSE.TXT
 #
 #
-#
-# Tasks for role alton
-#
-# Overview:
-#
-#
-# Dependencies:
-#
-#
-# Example play:
-#
-#
+# based on instructions at https://github.com/mozilla/openbadges-badgekit/wiki/BadgeKit-Self-Hosting-Guide
+
+- name: install nodejs - add ppa:chris-lea/node.js
+  apt_repository: repo='ppa:chris-lea/node.js' state=present
+
+- name: install nodejs - ensure python-software-properties is installed
+  apt: name=python-software-properties state=present
 
 - name: install nodejs
-    apt_repository: repo='ppa:chris-lea/node.js'
-    apt: name=python-software-properties state=present
-    apt: name=nodejs update_cache=yes
+  apt: name=nodejs update_cache=yes
 
-- name: clone api repo
-    git: >
-      dest={{ openbadges_code_dir }} repo='https://github.com/mozilla/badgekit-api.git'
-      dest={{ openbadges_code_dir }} repo='https://github.com/mozilla/openbadges-badgekit.git'
+- name: checkout badgekit-api repo
+  git: >
+    dest="{{ openbadges_code_dir }}/badgekit-api"
+    repo='https://github.com/mozilla/badgekit-api.git'
 
-- name: install api pre requisites
-    npm: path="{{ openbadges_code_dir }}/badgekit-api"
+- name: checkout openbadges-badgekit repo
+  git: >
+    dest="{{ openbadges_code_dir }}/openbadgekit-badgekit"
+    repo='https://github.com/mozilla/openbadges-badgekit.git'
+
+- name: install badgekit-api
+  npm: path="{{ openbadges_code_dir }}/badgekit-api"
 
 - name: setup badgekit api database
-    mysql_db: name={{ openbadges_mysql_db }} state=present
-    mysql_db: name={{ openbadges_mysql_db }} state=import target="{{ openbadges_code_dir }}/badgekit-api/schema.sql"
+  mysql_db: name={{ openbadges_mysql_db }} state=present
 
-- name: configure api
+- name: import badgekit default schema
+  mysql_db: name={{ openbadges_mysql_db }} state=import target="{{ openbadges_code_dir }}/badgekit-api/schema.sql"
 
-- name: run badgekit api
+#- name: configure api
 
-- name: configure badgekit
+#- name: run badgekit api
 
-- name: install badgekit dependencies
+#- name: configure badgekit
 
-- name: setup badgekit database
+#- name: install badgekit dependencies
 
-- name: run badgekit
+#- name: setup badgekit database
+
+#- name: run badgekit

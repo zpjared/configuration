@@ -11,3 +11,4 @@
 openbadges_code_dir: "{{ COMMON_APP_DIR }}/openbadges"
 
 api_mysql_db: "badgekitapi"
+badgekit_mysql_db: "badgekit"

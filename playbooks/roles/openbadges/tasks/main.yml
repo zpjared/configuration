@@ -56,17 +56,25 @@
 
 - name: configure badgekit api
   template: >
-    src=edx/app/openbadges/.env.j2
-    dest="{{ openbadges_code_dir }}/badgekit-api"
+    src=edx/app/openbadges/badgekit-api/.env.j2
+    dest="{{ openbadges_code_dir }}/badgekit-api/.env"
 
 - name: run badgekit api
   command: nf start & chdir="{{ openbadges_code_dir }}/badgekit-api"
 
+- name: configure badgekit
+  template: >
+    src=edx/app/openbadges/openbadgekit-badgekit/config.json.j2
+    dest="{{ openbadges_code_dir}}/openbadgekit-badgekit/config.json"
 
-#- name: configure badgekit
+- name: install badgekit npm dependencies
+  npm: path="{{ openbadges_code_dir }}/openbadgekit-badgekit"
 
-#- name: install badgekit dependencies
+- name: setup badgekit database
+  mysql_db: name={{ badgekit_mysql_db }} state=present
 
-#- name: setup badgekit database
+- name: database migration
+  command: bin/db-migrate up chdir="{{ openbadges_code_dir }}/openbadgekit-badgekit"
 
-#- name: run badgekit
+- name: run badgekit
+  command: nf start & chdir="{{ openbadges_code_dir }}/openbadgekit-badgekit"

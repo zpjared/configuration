@@ -35,11 +35,10 @@
     npm: path="{{ openbadges_code_dir }}/badgekit-api"
 
 - name: setup badgekit api database
-    mysql_db: name={{ OPENBADGES_MYSQL_DB }} state=present
-    mysql_db: name={{ OPENBADGES_MYSQL_DB }} state=import target="{{ openbadges_code_dir }}/badgekit-api/schema.sql"
+    mysql_db: name={{ openbadges_mysql_db }} state=present
+    mysql_db: name={{ openbadges_mysql_db }} state=import target="{{ openbadges_code_dir }}/badgekit-api/schema.sql"
 
 - name: configure api
-
 
 - name: run badgekit api
 

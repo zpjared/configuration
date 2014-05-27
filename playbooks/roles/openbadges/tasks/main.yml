@@ -13,8 +13,11 @@
 - name: install nodejs - add ppa:chris-lea/node.js
   apt_repository: repo='ppa:chris-lea/node.js' state=present
 
-- name: install nodejs - ensure python-software-properties is installed
-  apt: name=python-software-properties state=present
+- name: install apt packages
+  apt: pkg={{ item }}
+  with_items:
+  - mysql-server
+  - python-software-properties
 
 - name: install nodejs
   apt: name=nodejs update_cache=yes
@@ -29,18 +32,36 @@
     dest="{{ openbadges_code_dir }}/openbadgekit-badgekit"
     repo='https://github.com/mozilla/openbadges-badgekit.git'
 
+- name: install npm foreman
+  npm: name=foreman global=yes
+
 - name: install badgekit-api
   npm: path="{{ openbadges_code_dir }}/badgekit-api"
 
-- name: setup badgekit api database
-  mysql_db: name={{ openbadges_mysql_db }} state=present
+- name: create badgekit api database
+  mysql_db: name={{ api_mysql_db }} state=present
 
 - name: import badgekit default schema
-  mysql_db: name={{ openbadges_mysql_db }} state=import target="{{ openbadges_code_dir }}/badgekit-api/schema.sql"
+  mysql_db: >
+    name={{ api_mysql_db }} state=import
+    target="{{ openbadges_code_dir }}/badgekit-api/schema.sql"
 
-#- name: configure api
+- name: copy badgekit init system
+  template: src=tmp/badgekit.sql.j2 dest=/tmp/badgekit.sql
 
-#- name: run badgekit api
+- name: create badgekit system
+  mysql_db: >
+    name={{ api_mysql_db }} state=import
+    target="/tmp/badgekit.sql"
+
+- name: configure badgekit api
+  template: >
+    src=edx/app/openbadges/.env.j2
+    dest="{{ openbadges_code_dir }}/badgekit-api"
+
+- name: run badgekit api
+  command: nf start & chdir="{{ openbadges_code_dir }}/badgekit-api"
+
 
 #- name: configure badgekit
 

@@ -10,7 +10,7 @@
 #
 # based on instructions at https://github.com/mozilla/openbadges-badgekit/wiki/BadgeKit-Self-Hosting-Guide
 
-- name: install nodejs - add ppa:chris-lea/node.js
+- name: add ppa:chris-lea/node.js
   apt_repository: repo='ppa:chris-lea/node.js' state=present
 
 - name: install apt packages
@@ -18,6 +18,10 @@
   with_items:
   - mysql-server
   - python-software-properties
+  - libmysqlclient-dev
+
+- name: pip install mysql-python
+  pip: name=mysql-python
 
 - name: install nodejs
   apt: name=nodejs update_cache=yes
@@ -59,9 +63,6 @@
     src=edx/app/openbadges/badgekit-api/.env.j2
     dest="{{ openbadges_code_dir }}/badgekit-api/.env"
 
-- name: run badgekit api
-  command: nf start & chdir="{{ openbadges_code_dir }}/badgekit-api"
-
 - name: configure badgekit
   template: >
     src=edx/app/openbadges/openbadgekit-badgekit/config.json.j2
@@ -76,5 +77,8 @@
 - name: database migration
   command: bin/db-migrate up chdir="{{ openbadges_code_dir }}/openbadgekit-badgekit"
 
-- name: run badgekit
-  command: nf start & chdir="{{ openbadges_code_dir }}/openbadgekit-badgekit"
+#- name: run badgekit api
+#  command: nf start & chdir="{{ openbadges_code_dir }}/badgekit-api"
+
+#- name: run badgekit
+#  command: nf start & chdir="{{ openbadges_code_dir }}/openbadgekit-badgekit"

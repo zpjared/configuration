@@ -128,5 +128,7 @@ class CallbackModule(object):
                         if len(payload[msg_type][output]) > 1000:
                             payload[msg_type][output] = "(clipping) ... " \
                                     + payload[msg_type][output][-1000:]
-
-            self.sqs.send_message(self.queue, json.dumps(payload))
+            try:
+              self.sqs.send_message(self.queue, json.dumps(payload))
+            except:
+              print ("failed to write " +  str(len(payload[msg_type][output])) + " bytes: " + json.dumps(payload))  

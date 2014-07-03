@@ -51,7 +51,8 @@ if [[ ! -f $BOTO_CONFIG ]]; then
 fi
 
 extra_vars_file="/var/tmp/extra-vars-$$.yml"
-extra_var_arg="-e@${extra_vars_file}"
+extra_extra_vars_file="/var/tmp/extra-extra-vars-$$.yml"
+extra_var_arg="-e@${extra_vars_file} -e@${extra_extra_vars_file}"
 
 if [[ $edx_internal == "true" ]]; then
     # if this is a an edx server include
@@ -124,6 +125,9 @@ rabbitmq_refresh: True
 COMMON_HOSTNAME: $dns_name
 COMMON_DEPLOYMENT: edx
 COMMON_ENVIRONMENT: sandbox
+EOF
+
+cat << EOF > $extra_extra_vars_file
 # User provided extra vars
 $extra_vars
 EOF

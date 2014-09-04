@@ -34,7 +34,7 @@ if [[ -f ${WORKSPACE}/configuration-secure/ansible/vars/${deployment}.yml ]]; th
 fi
 
 if [[ $db_dry_run == "false" ]]; then
-    # Set this to an empty string if db_dry_run is 
+    # Set this to an empty string if db_dry_run is
     # not set.  By default the db_dry_run var is
     # set to --db-dry-run
     extra_var_args+=" -e db_dry_run=''"
@@ -47,6 +47,11 @@ extra_var_args+=" -e edxapp_user=jenkins"
 
 # Generate the json configuration files
 ansible-playbook -c local $extra_var_args --tags edxapp_cfg -i localhost, -s -U jenkins edxapp.yml
+
+# In here to work around https://code.launchpad.net/~wligtenberg/django-openid-auth/mysql_fix/+merge/22726
+if [ $openid_workaround ]; then
+  sed -i -e 's/claimed_id = models.TextField(max_length=2047, unique=True/claimed_id = models.CharField(max_length=255, unique=True/' $VIRTUAL_ENV/lib/python2.7/site-packages/django_openid_auth/models.py
+fi
 
 # Run migrations and replace literal '\n' with actual newlines to make the output
 # easier to read

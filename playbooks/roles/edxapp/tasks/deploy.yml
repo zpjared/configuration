@@ -122,6 +122,12 @@
   - "restart edxapp"
   - "restart edxapp_workers"
 
+# ignore npm ssl errors
+- name: Set the npm registry
+  shell:
+    npm config set strict-ssl false
+  environment: "{{ edxapp_environment }}"
+
 # Set the npm registry permissions
 - name: Set the npm registry permissions
   file:

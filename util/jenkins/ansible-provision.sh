@@ -114,6 +114,7 @@ edx_platform_version: $edxapp_version
 forum_version: $forum_version
 xqueue_version: $xqueue_version
 xserver_version: $xserver_version
+ora_version: $ora_version
 ease_version: $ease_version
 certs_version: $certs_version
 discern_version: $discern_version
@@ -216,7 +217,7 @@ EOF
 fi
 
 declare -A deploy
-roles="edxapp forum xqueue xserver discern certs demo testcourses"
+roles="edxapp forum xqueue xserver ora discern certs demo testcourses"
 for role in $roles; do
     deploy[$role]=${!role}
 done

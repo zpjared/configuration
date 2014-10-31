@@ -99,6 +99,8 @@ common_log_user: syslog
 
 common_git_ppa: "ppa:git-core/ppa"
 
+common_ca_certs_directory: '/usr/share/ca-certificates/mozilla/'
+
 # Skip supervisor tasks
 # When set to true this flag will allow you to install everything but keep
 # supervisor from starting any of the services.

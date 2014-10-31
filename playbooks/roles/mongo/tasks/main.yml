@@ -1,6 +1,6 @@
 
 ---
-- name: check to see that MongoDB 2.4 isn't installed
+- name: check to see that MongoDB 2.4 is not installed
   stat: path=/etc/init.d/mongodb
   register: mongodb_needs_upgrade
 
@@ -24,7 +24,7 @@
   apt_repository_1.8: >
     repo='{{ MONGODB_REPO }}'
     state=present
-    validate_certs=no
+
 
 - name: install mongo server and recommends
   apt: >

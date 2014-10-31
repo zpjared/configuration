@@ -99,7 +99,10 @@ common_log_user: syslog
 
 common_git_ppa: "ppa:git-core/ppa"
 
-common_ca_certs_directory: '/usr/share/ca-certificates/mozilla/'
+common_ca_certs:
+  - '/usr/share/ca-certificates/mozilla/*.crt'
+  - '/etc/ssl/certs/*.pem'
+  - '/etc/ssl/certs/*.crt'
 
 # Skip supervisor tasks
 # When set to true this flag will allow you to install everything but keep

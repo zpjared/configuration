@@ -9,7 +9,8 @@
 # script
 - name: Add Newlines
   shell: >
-    sed -i '$ s/-----END CERTIFICATE-----/-----END CERTIFICATE-----\n/' {{ common_ca_certs_directory }}/*.crt
+    sed -i '$ s/-----END CERTIFICATE-----/-----END CERTIFICATE-----\n/' {{ item }}
+  with_items: common_ca_certs
 
 - name: Add user www-data
   # This is the default user for nginx

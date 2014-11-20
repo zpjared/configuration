@@ -108,28 +108,44 @@
   sudo_user: "{{ supervisor_user }}"
   with_items: supervisor_pip_pkgs
 
-- name: create supervisor upstart job
-  template: >
-    src=etc/init/supervisor-upstart.conf.j2 dest=/etc/init/{{ supervisor_service }}.conf
-    owner=root group=root
-
+#- name: create supervisor upstart job
+#  template: >
+#    src=etc/init/supervisor-upstart.conf.j2 dest=/etc/init/{{ supervisor_service }}.conf
+#    owner=root group=root
+#
 # This script is aws specific and looks up instances
 # tags and enables services based on the 'services' tag
-# on instance startup.
-- name: create pre_supervisor upstart job
-  template: >
-    src=etc/init/pre_supervisor.conf.j2 dest=/etc/init/pre_supervisor.conf
-    owner=root group=root
-  when: supervisor_service == "supervisor" and disable_edx_services and not devstack
+# on instan
+#    owner={{ supervisor_user }}
+#    group={{ supervisor_service_user }}
+#  when: disable_edx_services
 
-- name: write the pre_suprevisor python script
-  copy: >
-    src=pre_supervisor_checks.py
-    dest={{ supervisor_app_dir }}/pre_supervisor_checks.py
-    mode=0750
+- name: create supervisor master config
+  template: >
+    src=edx/app/supervisor/supervisord.conf.j2 dest={{ supervisor_cfg }}
+    owner={{ supervisor_user }} groce startup.
+
     owner={{ supervisor_user }}
     group={{ supervisor_service_user }}
   when: disable_edx_services
+
+- name: create supervisor master config
+  template: >
+    src=edx/app/supervisor/supervisord.conf.j2 dest={{ supervisor_cfg }}
+    owner={{ supervisor_user }} gro#- name: create pre_supervisor upstart job
+#  template: >
+#    src=etc/init/pre_supervisor.conf.j2 dest=/etc/init/pre_supervisor.conf
+#    owner=root group=root
+#  when: supervisor_service == "supervisor" and disable_edx_services and not devstack
+#
+#- name: write the pre_suprevisor python script
+#  copy: >
+#    src=pre_supervisor_checks.py
+#    dest={{ supervisor_app_dir }}/pre_supervisor_checks.py
+#    mode=0750
+#    owner={{ supervisor_user }}
+#    group={{ supervisor_service_user }}
+#  when: disable_edx_services
 
 - name: create supervisor master config
   template: >
@@ -154,17 +170,17 @@
   - "{{ supervisor_cfg }}"
   - "{{ supervisor_cfg_dir }}"
 
-- name: start supervisor
-  service: >
-    name={{ supervisor_service }}
-    state=started
-  register: start_supervisor
+#- name: start supervisor
+#  service: >
+#    name={{ supervisor_service }}
+#    state=started
+#  register: start_supervisor
 
   # calling update on supervisor too soon after it
   # starts will result in an errror.
-- name: wait for web port to be available
-  wait_for: port={{ supervisor_http_bind_port }} timeout=5
-  ignore_errors: yes
+#- name: wait for web port to be available
+#  wait_for: port={{ supervisor_http_bind_port }} timeout=5
+#  ignore_errors: yes
   
   
   # call supervisorctl update every time, this reloads
@@ -173,7 +189,7 @@
   # we don't use notifications for supervisor because
   # they don't work well with parameterized roles.
   # See https://github.com/ansible/ansible/issues/4853
-- name: update supervisor configuration
-  shell:  "{{ supervisor_ctl }} -c {{ supervisor_cfg }} update"
-  register: supervisor_update
-  changed_when: supervisor_update.stdout is defined and supervisor_update.stdout != ""
+#- name: update supervisor configuration
+#  shell:  "{{ supervisor_ctl }} -c {{ supervisor_cfg }} update"
+#  register: supervisor_update
+#  changed_when: supervisor_update.stdout is defined and supervisor_update.stdout != ""

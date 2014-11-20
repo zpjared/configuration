@@ -123,20 +123,14 @@
 - name: create supervisor master config
   template: >
     src=edx/app/supervisor/supervisord.conf.j2 dest={{ supervisor_cfg }}
-    owner={{ supervisor_user }} groce startup.
-
-    owner={{ supervisor_user }}
-    group={{ supervisor_service_user }}
-  when: disable_edx_services
-
-- name: create supervisor master config
-  template: >
-    src=edx/app/supervisor/supervisord.conf.j2 dest={{ supervisor_cfg }}
-    owner={{ supervisor_user }} gro#- name: create pre_supervisor upstart job
-#  template: >
-#    src=etc/init/pre_supervisor.conf.j2 dest=/etc/init/pre_supervisor.conf
-#    owner=root group=root
-#  when: supervisor_service == "supervisor" and disable_edx_services and not devstack
+    owner={{ supervisor_user }} group={{ supervisor_service_user }}
+    mode=0644
+- name: create a symlink for supervisortctl
+  file: >
+    src={{ supervisor_ctl }}
+    dest={{ COMMON_BIN_DIR }}/{{ supervisor_ctl|basename }}
+    state=link
+  when: supervisor_service == "supervisor"
 #
 #- name: write the pre_suprevisor python script
 #  copy: >

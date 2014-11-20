@@ -1,4 +1,4 @@
--- name: Deploy forum
+- name: Deploy forum
   hosts: all
   sudo: True
   gather_facts: True

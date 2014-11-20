@@ -65,8 +65,8 @@
 - name: start mongo service
   service: name=mongod state=started
 
-- name: wait for mongo server to start
-  wait_for: port=27017 delay=2
+#- name: wait for mongo server to start
+#  wait_for: port=27017 delay=2
 
 - name: Create the file to initialize the mongod replica set
   template: src=repset_init.j2 dest=/tmp/repset_init.js

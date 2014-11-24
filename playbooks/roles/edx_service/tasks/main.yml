@@ -32,6 +32,7 @@
     name="{{ edx_service_name }}"
     home="{{ COMMON_APP_DIR }}/{{ edx_service_name }}"
     createhome=no
+    generate_ssh_key=yes
     shell=/bin/false
 
 - name: create edx_service app and venv dir

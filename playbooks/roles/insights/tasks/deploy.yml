@@ -1,10 +1,5 @@
 ---
 
-- name: install read-only ssh key
-  copy: >
-    content="{{ INSIGHTS_GIT_IDENTITY }}" dest={{ insights_git_identity_file }}
-    owner={{ insights_user }} group={{ insights_user }} mode=0600
-
 - name: setup the insights env file
   template: >
     src="edx/app/insights/insights_env.j2"

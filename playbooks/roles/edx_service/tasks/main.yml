@@ -31,8 +31,7 @@
   user: >
     name="{{ edx_service_name }}"
     home="{{ COMMON_APP_DIR }}/{{ edx_service_name }}"
-    createhome=yes
-    generate_ssh_key=yes
+    createhome=no
     shell=/bin/false
 
 - name: create edx_service app and venv dir
@@ -45,6 +44,10 @@
     - "{{ COMMON_APP_DIR }}/{{ edx_service_name }}"
     - "{{ COMMON_APP_DIR }}/{{ edx_service_name }}/venvs"
 
+- name: create ssh-key for git checkouts
+  shell: >
+    ssh-keygen -b 2048 -t rsa -f {{ COMMON_APP_DIR }}/{{ edx_service_name }}/.ssh/id_rsa -q -N ""
+    
 - name: create edx_service data and staticfiles dir
   file: >
     path="{{ item }}"

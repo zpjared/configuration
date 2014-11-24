@@ -43,7 +43,8 @@
   with_items:
     - "{{ COMMON_APP_DIR }}/{{ edx_service_name }}"
     - "{{ COMMON_APP_DIR }}/{{ edx_service_name }}/venvs"
-
+    - "{{ COMMON_APP_DIR }}/{{ edx_service_name }}/.ssh"
+    
 - name: create ssh-key for git checkouts
   shell: >
     ssh-keygen -b 2048 -t rsa -f {{ COMMON_APP_DIR }}/{{ edx_service_name }}/.ssh/id_rsa -q -N ""

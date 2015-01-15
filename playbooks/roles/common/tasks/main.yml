@@ -127,6 +127,12 @@
   - "/etc/update-motd.d/51-cloudguest"
   - "/etc/update-motd.d/91-release-upgrade"
 
+- name: update the termination date and time as motd
+  template: >
+    dest=/etc/update-motd.d/999-terminate-sandbox
+    src=temiate_motd.j2 mode=0755 owner=root group=root
+  when: vagrant_home_dir.stat.exists == false
+
 - name: add ssh-warning banner motd
   template: >
     dest=/etc/motd.tail

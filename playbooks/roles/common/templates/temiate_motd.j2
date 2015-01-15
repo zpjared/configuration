@@ -1,0 +1,18 @@
+#!/usr/bin/python
+
+import boto
+from boto.utils import get_instance_metadata
+from datetime import datetime
+from datetime import timedelta
+
+instance_id = get_instance_metadata()['instance-id']
+ec2 = boto.connect_ec2()
+
+reservations = ec2.get_all_instances(instance_ids=[instance_id])
+launch_time = reservations[0].instances[0].launch_time
+
+launch_time = datetime.strptime(launch_time, "%Y-%m-%dT%H:%M:%S.%fZ")
+terminate_time = launch_time + timedelta(days=7)
+
+
+print ("This system will be terminated on {:%d, %b %Y} at {:%H:%M:%S} UTC".format(terminate_time,terminate_time))

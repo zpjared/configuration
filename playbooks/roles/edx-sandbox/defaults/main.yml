@@ -1,0 +1,25 @@
+---
+#
+# edX Configuration
+#
+# github:     https://github.com/edx/configuration
+# wiki:       https://github.com/edx/configuration/wiki
+# code style: https://github.com/edx/configuration/wiki/Ansible-Coding-Conventions
+# license:    https://github.com/edx/configuration/blob/master/LICENSE.TXT
+#
+##
+# Defaults for role edx-sandbox
+# 
+
+#
+# vars are namespace with the module name.
+#
+edx-sandbox_role_name: edx-sandbox
+
+#
+# OS packages
+#
+
+edx-sandbox_debian_pkgs: []
+
+edx-sandbox_redhat_pkgs: []

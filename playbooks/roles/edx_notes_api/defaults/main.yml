@@ -44,7 +44,7 @@ EDX_NOTES_API_REPOS:
     DOMAIN: "{{COMMON_GIT_MIRROR}}"
     PATH: "{{COMMON_GIT_PATH}}"
     REPO: "{{ edx_notes_api_service_name }}.git"
-    VERSION: e0d/migration-overrides
+    VERSION: master
     DESTINATION: "{{edx_notes_api_code_dir}}"
 
 #
